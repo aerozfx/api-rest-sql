@@ -1,3 +1,4 @@
+-- 1
 CREATE TABLE authors (
   id_author serial NOT NULL PRIMARY KEY, 
   name varchar(45) NOT NULL, 
@@ -5,7 +6,7 @@ CREATE TABLE authors (
   email varchar(100) NOT NULL UNIQUE,
   image varchar(255)
 );
-
+-- 1
 CREATE TABLE entries (
   id_entry serial NOT NULL PRIMARY KEY, 
   title varchar(100) NOT NULL UNIQUE, 
@@ -15,7 +16,7 @@ CREATE TABLE entries (
   category varchar(15),
   FOREIGN KEY (id_author) REFERENCES authors(id_author)
 );
-
+-- 2
 INSERT INTO authors(name,surname,email,image)
 VALUES
 ('Alejandru','Regex','alejandru@thebridgeschool.es','https://randomuser.me/api/portraits/thumb/men/75.jpg'),
@@ -23,7 +24,7 @@ VALUES
 ('Alvaru','Riveru','alvaru@thebridgeschool.es','https://randomuser.me/api/portraits/thumb/men/45.jpg'),
 ('Muchelle','Wuallus','muchelle@thebridgeschool.es','https://randomuser.me/api/portraits/thumb/women/72.jpg'),
 ('Albertu','Henriques','albertu@thebridgeschool.es','https://randomuser.me/api/portraits/thumb/men/33.jpg');
-
+-- 3
 INSERT INTO entries(title,content,id_author,category)
 VALUES 
 ('Noticia: SOL en Madrid','Contenido noticia 1',(SELECT id_author FROM authors WHERE email='alejandru@thebridgeschool.es'),'Tiempo'),
@@ -31,3 +32,38 @@ VALUES
 ('El rayo gana la champions','Victoria por goleada en la final de la champions',(SELECT id_author FROM authors WHERE email='albertu@thebridgeschool.es'),'Deportes'),
 ('Amanece Madrid lleno de arena','La calima satura Madrid de arena. Pérdidas millonarias',(SELECT id_author FROM authors WHERE email='birja@thebridgeschool.es'),'Sucesos'),
 ('Descubren el motor de agua','Fin de la gasolina. A partir de ahora usaremos agua en nuestros coches',(SELECT id_author FROM authors WHERE email='alvaru@thebridgeschool.es'),'Ciencia')
+
+-- 4
+SELECT a.email, COUNT(e.id_entry) AS entries
+FROM entries e
+JOIN authors a
+ON a.id_author = e.id_author
+GROUP BY a.email;
+
+-- 5
+SELECT *
+FROM entries
+ORDER BY date DESC
+
+-- 6
+SELECT e.*
+FROM entries e, authors a
+WHERE e.id_author = a.id_author AND a.email = 'birja@thebridgeschool.es'
+
+-- 6
+SELECT a.name || ' ' || a.surname AS nombre_completo
+FROM entries e, authors a
+WHERE e.id_author = a.id_author
+GROUP BY nombre_completo
+HAVING COUNT(e.id_entry) >= 2
+
+-- 7
+SELECT e.title, e.content, e.date, (a.name || ' ' || a.surname) AS nombre_completo
+FROM entries e
+INNER JOIN authors a ON e.id_author = a.id_author
+WHERE a.email = 'birja@thebridgeschool.es'
+
+-- 8
+SELECT (a.name || ' ' || a.surname) as nombre_completo
+FROM authors a
+WHERE a.id_author NOT IN (SELECT e.id_author FROM entries e)
